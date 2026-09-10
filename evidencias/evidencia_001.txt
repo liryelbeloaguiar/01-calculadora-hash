@@ -1,0 +1,6 @@
+Esta é uma evidência digital utilizada exclusivamente
+para fins de estudo de perícia digital.
+Caso: PF-LAB-001
+Evidência: EVD-001
+
+ALTERADO
