@@ -92,6 +92,8 @@ os.makedirs("resultado", exist_ok=True)
 
 nome_arquivo = os.path.basename(caminho)
 
+extensao = os.path.splitext(nome_arquivo)[1]
+
 nome_arquivo_sem_extensao = os.path.splitext(nome_arquivo)[0]
 
 registro = os.path.join(
@@ -106,8 +108,9 @@ with open(registro, "w", encoding="utf-8") as arquivo:
 
     arquivo.write(f"ID da evidência: {id_evidencia}\n")
     arquivo.write(f"Tipo da evidência: {tipo_evidencia}\n")
-    arquivo.write(f"Arquivo: {nome_arquivo}\n")
-    arquivo.write(f"Caminho: {caminho}\n")
+    arquivo.write(f"Arquivo original: {nome_arquivo}\n")
+    arquivo.write(f"Extensão: {extensao}\n")
+    arquivo.write(f"Caminho original: {caminho}\n")
     arquivo.write(f"Tamanho: {tamanho} bytes\n")
     arquivo.write(f"Data/Hora da análise: {data_hora}\n\n")
 
