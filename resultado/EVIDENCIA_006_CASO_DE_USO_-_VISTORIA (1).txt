@@ -1,0 +1,14 @@
+=== REGISTRO DE ANALISE DE EVIDENCIA DIGITAL ===
+
+ID da evidência: EVIDENCIA_006
+Tipo da evidência: DOCUMENTO
+Arquivo original: CASO_DE_USO_-_VISTORIA (1).pdf
+Extensão: .pdf
+Caminho original: C:\Users\liryel.aguiar\Downloads\CASO_DE_USO_-_VISTORIA (1).pdf
+Tamanho: 95132 bytes
+Data/Hora da análise: 17/09/2026 13:57:48
+
+=== HASHES ===
+MD5: 9aeb9db143a1503195587c9205246518
+SHA-256: 93448df50c0566e45445bbd15610c0b490af1adf45819052500041887bbe3735
+SHA-512: b07f31aee12e05d68da53ae23cbd6b8398dc39ada3e9d405d1d02a956e99b41ff514ececfab8a977f39460e3b5ac6a92ff1994613ba9d40eadde62099c15575b

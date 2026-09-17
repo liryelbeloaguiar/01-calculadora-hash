@@ -1,0 +1,14 @@
+=== REGISTRO DE ANALISE DE EVIDENCIA DIGITAL ===
+
+ID da evidência: EVIDENCIA_009
+Tipo da evidência: DOCUMENTO
+Arquivo original: evidencia_001.txt
+Extensão: .txt
+Caminho original: evidencias/evidencia_001.txt
+Tamanho: 135 bytes
+Data/Hora da análise: 17/09/2026 14:02:17
+
+=== HASHES ===
+MD5: 7b2710d34852793643157feac9ae243c
+SHA-256: 7d69e16bf950c9d98bdb2682d67fec0385cbc9441649e31691d7af3ccbd1f226
+SHA-512: f6def8bed50e1d0962e7714a5a347694a4001c08dbb1cb4fb43e18dea1966a84bdb7137496ae0462009b38f6a092c26d2da9a1ab0264e72a09e3662c10756283

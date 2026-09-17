@@ -2,6 +2,33 @@ import hashlib
 import os
 from datetime import datetime
 
+def calcular_hashes(caminho):
+    md5 = hashlib.md5()
+    sha256 = hashlib.sha256()
+    sha512 = hashlib.sha512()
+
+    with open(caminho, "rb") as arquivo:
+        while bloco := arquivo.read(4096):
+            md5.update(bloco)
+            sha256.update(bloco)
+            sha512.update(bloco)
+
+    return {
+        "MD5": md5.hexdigest(),
+        "SHA-256": sha256.hexdigest(),
+        "SHA-512": sha512.hexdigest()
+    }
+
+
+def verificar_integridade(caminho, hash_registrado):
+    hashes_atuais = calcular_hashes(caminho)
+
+    hash_atual = hashes_atuais["SHA-256"]
+
+    if hash_atual == hash_registrado:
+        return True, hash_atual
+
+    return False, hash_atual
 
 def gerar_proximo_id():
     os.makedirs("resultado", exist_ok=True)
@@ -67,21 +94,11 @@ if not os.path.exists(caminho):
     exit()
 
 
-md5 = hashlib.md5()
-sha256 = hashlib.sha256()
-sha512 = hashlib.sha512()
+hashes = calcular_hashes(caminho)
 
-
-with open(caminho, "rb") as arquivo:
-    while bloco := arquivo.read(4096):
-        md5.update(bloco)
-        sha256.update(bloco)
-        sha512.update(bloco)
-
-
-md5 = md5.hexdigest()
-sha256 = sha256.hexdigest()
-sha512 = sha512.hexdigest()
+md5 = hashes["MD5"]
+sha256 = hashes["SHA-256"]
+sha512 = hashes["SHA-512"]
 
 
 tamanho = os.path.getsize(caminho)
@@ -131,3 +148,19 @@ print(f"SHA-256: {sha256}")
 print(f"SHA-512: {sha512}")
 print(f"Data/Hora da análise: {data_hora}")
 print(f"\nRegistro salvo em: {registro}")
+
+hash_registrado = input("\nDigite o SHA-256 registrado: ")
+
+integridade, hash_atual = verificar_integridade(
+    caminho,
+    hash_registrado
+)
+
+print("\n=== VERIFICAÇÃO DE INTEGRIDADE ===")
+print(f"Hash registrado: {hash_registrado}")
+print(f"Hash atual:      {hash_atual}")
+
+if integridade:
+    print("RESULTADO: INTEGRIDADE PRESERVADA")
+else:
+    print("RESULTADO: ALTERAÇÃO DETECTADA")
