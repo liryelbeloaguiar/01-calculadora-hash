@@ -1,18 +1,27 @@
 import hashlib
+import os
 
-arquivo = input("Digite o caminho do arquivo: ")
+caminho = input("Digite o caminho do arquivo: ")
 
-with open(arquivo, "rb") as f:
-    conteudo = f.read()
+if not os.path.exists(caminho):
+    print("\nERRO: O arquivo informado não existe.")
+    exit()
 
-md5 = hashlib.md5(conteudo).hexdigest()
-sha256 = hashlib.sha256(conteudo).hexdigest()
+md5 = hashlib.md5()
+sha256 = hashlib.sha256()
 
-print()
-print("=== ANALISE DE INTEGRIDADE ===")
-print()
-print(f"Arquivo: {arquivo}")
-print(f"Tamanho: {len(conteudo)} bytes")
-print()
-print(f"MD5:     {md5}")
+with open(caminho, "rb") as arquivo:
+    while bloco := arquivo.read(4096):
+        md5.update(bloco)
+        sha256.update(bloco)
+
+md5 = md5.hexdigest()
+sha256 = sha256.hexdigest()
+
+tamanho = os.path.getsize(caminho)
+
+print("\n=== ANALISE DE INTEGRIDADE ===")
+print(f"Arquivo: {caminho}")
+print(f"Tamanho: {tamanho} bytes")
+print(f"MD5: {md5}")
 print(f"SHA-256: {sha256}")
