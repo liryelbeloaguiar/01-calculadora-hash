@@ -2,6 +2,7 @@ import hashlib
 import os
 from datetime import datetime
 
+
 def calcular_hashes(caminho):
     md5 = hashlib.md5()
     sha256 = hashlib.sha256()
@@ -30,6 +31,7 @@ def verificar_integridade(caminho, hash_registrado):
 
     return False, hash_atual
 
+
 def gerar_proximo_id():
     os.makedirs("resultado", exist_ok=True)
 
@@ -38,7 +40,9 @@ def gerar_proximo_id():
     maior_numero = 0
 
     for arquivo in arquivos:
+
         if arquivo.startswith("EVIDENCIA_"):
+
             partes = arquivo.split("_")
 
             try:
@@ -55,112 +59,247 @@ def gerar_proximo_id():
     return f"EVIDENCIA_{proximo_numero:03d}"
 
 
-caminho = input("Digite o caminho do arquivo: ")
+def buscar_hash_registrado(id_evidencia):
 
-id_evidencia = gerar_proximo_id()
+    arquivos = os.listdir("resultado")
 
-tipos_evidencia = {
-    "1": "DOCUMENTO",
-    "2": "IMAGEM",
-    "3": "VIDEO",
-    "4": "AUDIO",
-    "5": "ARQUIVO",
-    "6": "LOG",
-    "7": "BANCO DE DADOS",
-    "8": "OUTRO"
-}
+    for arquivo in arquivos:
 
-print("\n=== TIPO DA EVIDÊNCIA ===")
-print("1 - DOCUMENTO")
-print("2 - IMAGEM")
-print("3 - VIDEO")
-print("4 - AUDIO")
-print("5 - ARQUIVO")
-print("6 - LOG")
-print("7 - BANCO DE DADOS")
-print("8 - OUTRO")
+        if arquivo.startswith(id_evidencia + "_") and arquivo.endswith(".txt"):
 
-opcao_tipo = input("Digite o número do tipo: ")
+            caminho_registro = os.path.join("resultado", arquivo)
 
-while opcao_tipo not in tipos_evidencia:
-    print("ERRO: Tipo de evidência inválido.")
-    opcao_tipo = input("Digite uma opção de 1 a 8: ")
+            with open(caminho_registro, "r", encoding="utf-8") as registro:
 
-tipo_evidencia = tipos_evidencia[opcao_tipo]
+                for linha in registro:
+
+                    if linha.startswith("SHA-256:"):
+
+                        return linha.split(":", 1)[1].strip()
+
+    return None
 
 
-if not os.path.exists(caminho):
-    print("\nERRO: O arquivo informado não existe.")
-    exit()
+def executar_verificacao():
+
+    print("\n=== VERIFICAÇÃO DE INTEGRIDADE ===")
+
+    id_evidencia = input("Digite o ID da evidência: ")
+
+    caminho = input("Digite o caminho atual do arquivo: ")
+
+    if not os.path.exists(caminho):
+
+        print("\nERRO: O arquivo informado não existe.")
+
+        return
+
+    hash_registrado = buscar_hash_registrado(id_evidencia)
+
+    if hash_registrado is None:
+
+        print("\nERRO: Evidência não encontrada.")
+
+        return
+
+    integridade, hash_atual = verificar_integridade(
+        caminho,
+        hash_registrado
+    )
+
+    print(f"\nID da evidência: {id_evidencia}")
+    print(f"Hash registrado: {hash_registrado}")
+    print(f"Hash atual:      {hash_atual}")
+
+    if integridade:
+
+        print("\nRESULTADO: INTEGRIDADE PRESERVADA")
+
+    else:
+
+        print("\nRESULTADO: ALTERAÇÃO DETECTADA")
 
 
-hashes = calcular_hashes(caminho)
+def executar_nova_analise():
 
-md5 = hashes["MD5"]
-sha256 = hashes["SHA-256"]
-sha512 = hashes["SHA-512"]
+    print("\n=== NOVA ANÁLISE ===")
+
+    caminho = input("Digite o caminho do arquivo: ")
+
+    if not os.path.exists(caminho):
+
+        print("\nERRO: O arquivo informado não existe.")
+
+        return
+
+    id_evidencia = gerar_proximo_id()
+
+    tipos_evidencia = {
+        "1": "DOCUMENTO",
+        "2": "IMAGEM",
+        "3": "VIDEO",
+        "4": "AUDIO",
+        "5": "ARQUIVO",
+        "6": "LOG",
+        "7": "BANCO DE DADOS",
+        "8": "OUTRO"
+    }
+
+    print("\n=== TIPO DA EVIDÊNCIA ===")
+
+    print("1 - DOCUMENTO")
+    print("2 - IMAGEM")
+    print("3 - VIDEO")
+    print("4 - AUDIO")
+    print("5 - ARQUIVO")
+    print("6 - LOG")
+    print("7 - BANCO DE DADOS")
+    print("8 - OUTRO")
+
+    opcao_tipo = input("Digite o número do tipo: ")
+
+    while opcao_tipo not in tipos_evidencia:
+
+        print("ERRO: Tipo de evidência inválido.")
+
+        opcao_tipo = input("Digite uma opção de 1 a 8: ")
+
+    tipo_evidencia = tipos_evidencia[opcao_tipo]
+
+    hashes = calcular_hashes(caminho)
+
+    md5 = hashes["MD5"]
+    sha256 = hashes["SHA-256"]
+    sha512 = hashes["SHA-512"]
+
+    tamanho = os.path.getsize(caminho)
+
+    data_hora = datetime.now().strftime(
+        "%d/%m/%Y %H:%M:%S"
+    )
+
+    nome_arquivo = os.path.basename(caminho)
+
+    extensao = os.path.splitext(nome_arquivo)[1]
+
+    nome_arquivo_sem_extensao = os.path.splitext(
+        nome_arquivo
+    )[0]
+
+    registro = os.path.join(
+        "resultado",
+        f"{id_evidencia}_{nome_arquivo_sem_extensao}.txt"
+    )
+
+    with open(
+        registro,
+        "w",
+        encoding="utf-8"
+    ) as arquivo:
+
+        arquivo.write(
+            "=== REGISTRO DE ANALISE DE EVIDENCIA DIGITAL ===\n\n"
+        )
+
+        arquivo.write(
+            f"ID da evidência: {id_evidencia}\n"
+        )
+
+        arquivo.write(
+            f"Tipo da evidência: {tipo_evidencia}\n"
+        )
+
+        arquivo.write(
+            f"Arquivo original: {nome_arquivo}\n"
+        )
+
+        arquivo.write(
+            f"Extensão: {extensao}\n"
+        )
+
+        arquivo.write(
+            f"Caminho original: {caminho}\n"
+        )
+
+        arquivo.write(
+            f"Tamanho: {tamanho} bytes\n"
+        )
+
+        arquivo.write(
+            f"Data/Hora da análise: {data_hora}\n\n"
+        )
+
+        arquivo.write("=== HASHES ===\n")
+
+        arquivo.write(
+            f"MD5: {md5}\n"
+        )
+
+        arquivo.write(
+            f"SHA-256: {sha256}\n"
+        )
+
+        arquivo.write(
+            f"SHA-512: {sha512}\n"
+        )
+
+    print("\n=== ANÁLISE CONCLUÍDA ===")
+
+    print(f"ID da evidência: {id_evidencia}")
+    print(f"Arquivo: {nome_arquivo}")
+    print(f"Tipo: {tipo_evidencia}")
+    print(f"Tamanho: {tamanho} bytes")
+    print(f"MD5: {md5}")
+    print(f"SHA-256: {sha256}")
+    print(f"SHA-512: {sha512}")
+    print(f"Data/Hora: {data_hora}")
+
+    print(f"\nRegistro salvo em: {registro}")
 
 
-tamanho = os.path.getsize(caminho)
+def menu_principal():
 
-data_hora = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+    while True:
 
-os.makedirs("resultado", exist_ok=True)
+        print("\n")
+        print("=" * 40)
+        print("   ANALISADOR DE EVIDÊNCIAS DIGITAIS")
+        print("=" * 40)
 
-nome_arquivo = os.path.basename(caminho)
+        print("\n1 - Nova análise")
+        print("2 - Verificar integridade")
+        print("3 - Consultar evidência")
+        print("4 - Listar evidências")
+        print("5 - Sair")
 
-extensao = os.path.splitext(nome_arquivo)[1]
+        opcao = input("\nEscolha uma opção: ")
 
-nome_arquivo_sem_extensao = os.path.splitext(nome_arquivo)[0]
+        if opcao == "1":
 
-registro = os.path.join(
-    "resultado",
-    f"{id_evidencia}_{nome_arquivo_sem_extensao}.txt"
-)
+            executar_nova_analise()
+
+        elif opcao == "2":
+
+            executar_verificacao()
+
+        elif opcao == "3":
+
+            print("\nFuncionalidade ainda não implementada.")
+
+        elif opcao == "4":
+
+            print("\nFuncionalidade ainda não implementada.")
+
+        elif opcao == "5":
+
+            print("\nEncerrando o programa...")
+
+            break
+
+        else:
+
+            print("\nERRO: Opção inválida.")
 
 
-with open(registro, "w", encoding="utf-8") as arquivo:
+menu_principal()
 
-    arquivo.write("=== REGISTRO DE ANALISE DE EVIDENCIA DIGITAL ===\n\n")
-
-    arquivo.write(f"ID da evidência: {id_evidencia}\n")
-    arquivo.write(f"Tipo da evidência: {tipo_evidencia}\n")
-    arquivo.write(f"Arquivo original: {nome_arquivo}\n")
-    arquivo.write(f"Extensão: {extensao}\n")
-    arquivo.write(f"Caminho original: {caminho}\n")
-    arquivo.write(f"Tamanho: {tamanho} bytes\n")
-    arquivo.write(f"Data/Hora da análise: {data_hora}\n\n")
-
-    arquivo.write("=== HASHES ===\n")
-
-    arquivo.write(f"MD5: {md5}\n")
-    arquivo.write(f"SHA-256: {sha256}\n")
-    arquivo.write(f"SHA-512: {sha512}\n")
-
-
-print("\n=== ANALISE DE INTEGRIDADE ===")
-print(f"ID da evidência: {id_evidencia}")
-print(f"Arquivo: {caminho}")
-print(f"Tipo da evidência: {tipo_evidencia}")
-print(f"Tamanho: {tamanho} bytes")
-print(f"MD5: {md5}")
-print(f"SHA-256: {sha256}")
-print(f"SHA-512: {sha512}")
-print(f"Data/Hora da análise: {data_hora}")
-print(f"\nRegistro salvo em: {registro}")
-
-hash_registrado = input("\nDigite o SHA-256 registrado: ")
-
-integridade, hash_atual = verificar_integridade(
-    caminho,
-    hash_registrado
-)
-
-print("\n=== VERIFICAÇÃO DE INTEGRIDADE ===")
-print(f"Hash registrado: {hash_registrado}")
-print(f"Hash atual:      {hash_atual}")
-
-if integridade:
-    print("RESULTADO: INTEGRIDADE PRESERVADA")
-else:
-    print("RESULTADO: ALTERAÇÃO DETECTADA")
